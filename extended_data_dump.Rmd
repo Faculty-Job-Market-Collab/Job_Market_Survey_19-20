@@ -1,0 +1,18 @@
+---
+title: "Extended data figures"
+author: "Ada Hagan"
+date: "1/7/2022"
+output: pdf_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align = "left")
+library(tidyverse)
+library(rmarkdown)
+library(knitr)
+library(scales)
+source("code/load_data.R")
+```
+
+

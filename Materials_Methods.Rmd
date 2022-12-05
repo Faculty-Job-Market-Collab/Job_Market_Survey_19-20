@@ -1,0 +1,34 @@
+---
+title: ""
+author: ""
+date: ""
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Materials & Methods
+
+
+## Data collection
+
+We designed a survey to collect self-reported demographics and academic metrics for assistant professor applicants during the 2019–2020 academic job search cycle. The survey was open from X to X, and respondents were not required to answer all questions. Variables of interest for the survey included faculty application outcomes such as interviews, offers and their corresponding institutions; applicant offer responses; and applicant demographics including gender, race, research category, position, first generation PhD status, and visa status. 
+
+The survey was distributed on various social media platforms including the Future PI Slack group, Twitter, and Facebook, and by several postdoctoral association mailing lists in North America, Europe and Asia. The survey was open for approximately six weeks to collect responses. Survey responses that did not meet the minimum completion threshold of 33% or indicated the respondent had previously held a tenure-track position were dropped from the analysis.
+
+
+
+Aggregated data and survey questions are available in the GitHub repositiory: XXX.
+
+## Data categorization and analysis
+
+Where institutions were named, the institution names were cleaned manually and joined with the 2018 Carnegie classification data (https://carnegieclassifications.iu.edu/downloads.php). Using these data, we classified educational institutions based on the National Science Foundation definition for primarily undergraduate institutions (PUIs). PUIs were classifed as colleges and universities that have awarded 20 or fewer Ph.D./D.Sci. degrees during the previous academic year. An institution with more than 20 Ph.D/D.Sci. degrees awarded during the previous academic year were classified as research intensive (RI) institutions. Both the Carnegie classification and job advertisement location data were used to identify institution country and USA region, where appropriate.
+
+Responses categorized as "yes" included "Temporary student visa (e.g., F1, J1 in U.S.)", "Temporary work visa (e.g., H1B in U.S.)", and "Applying from outside the country(ies)". Responses categorized as "no" included "Citizen" and "Permanent resident".
+
+
+
+Data were manipulated, and visualized using R statistical software (version 3.4.4) and relevant packages. Wherever statistical analyses were used, the tests are reported in the corresponding figure legend. A p-value of less than 0.05 was considered significant. All code used for data analysis and visualization are available in the GitHub repository: XXX.
+

@@ -1,1 +1,10 @@
-data/
+*.pdf
+*.csv
+/data
+*/data
+*/figures
+*/manuscript
+*.xlsx
+*.docx
+/BWF_grant
+*.RData

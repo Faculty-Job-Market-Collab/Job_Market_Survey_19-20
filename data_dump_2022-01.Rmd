@@ -1,0 +1,221 @@
+---
+title: "Job Survey Data Dump"
+author: "Ada Hagan"
+date: "1/5/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align = "left")
+library(tidyverse)
+library(rmarkdown)
+library(knitr)
+library(scales)
+source("code/load_data.R")
+source("code/data_dump.R")
+```
+
+# Intro
+
+The following pages contains rough bar graphs of each survey question plotted according to the respondents' gender, race/ethnicity, and whether they recieved at least one job offer. The plots are grouped acording to the survey sections: demographics, qualifications, perceptions, preparation, network, and application outcome(s). At the end is another section of plots that plots the response to assorted, new survey questions. 
+
+The title of each plot indicates the number of respondents that answered the question (i.e., does not include empty responses) and the question that they were responding to. There is an excel file that matches the abbreviated question to the full survey question. The response to the question is on the y-axis and the percent on the x-axis. The colors correspond to either gender, race/ethnicity, or offer, as indicated.
+
+Numbered responses:
+
+- large numbers(2015 citations, h-indecies) were placed in larger bins: 0, "< 10",
+"10-19", "20-49", "50-99", "100-149", "150-199", "200-299", "300-399", "400-499", "500-999", "1000-1499", "1500-1999", "2000-2999", "3000-3999", & "4000+"
+
+- medium numbers (publications, citations) were placed in smaller bins that began at 10: "10-14","15-19", "20-29", "30-39", "40-49", "50-99", "100-199", "200-299", & "300+"
+
+- if _all_ responses were below 10-15, the responses were not binned
+
+- bins without any entries are not represented in the plots
+
+- the summary tables are based on the raw (not binned) numbers
+
+
+With regards to the race/ethnicity plots, respondents were allowed to chose multiple race/ethnicity responses; a single respondent can be counted multiple times, which may affect the data distribution compared to the gender comparison. Below is a copy of the race/ethnicity legend, since it is cut off in some of the plots.
+
+```{r legend}
+plot_legend
+```
+
+## Demographics
+
+### With Gender 
+
+```{r gender-demo}
+gender_demo_plots
+```
+
+### With Race/Ethnicity
+
+```{r race-demo}
+eth_demo_plots
+```
+
+### With Offer 
+
+```{r offer-demo}
+offer_demo_plots
+```
+
+## Qualifications
+
+### With Gender 
+
+```{r gender-qualif}
+gender_qual_plots
+```
+
+### With Race/Ethnicity
+
+```{r race-qualif}
+eth_qual_plots
+```
+
+### With Offer 
+
+```{r offer-qualif}
+offer_qual_plots
+```
+
+### Summary Table
+
+`r kable(qualif_summary)`
+
+## Perceptions
+
+### With Gender 
+```{r gender-percept}
+gender_percept_plots
+```
+
+### With Race/Ethnicity
+
+```{r race-percept}
+eth_percept_plots
+```
+
+### With Offer 
+
+```{r offer-percept}
+offer_percept_plots
+```
+
+## Preparation
+
+### With Gender 
+
+```{r gender-prep}
+gender_prep_plots
+```
+
+### With Race/Ethnicity
+
+
+```{r race-prep}
+eth_prep_plots
+```
+
+### With Offer 
+
+```{r offer-prep}
+offer_prep_plots
+```
+
+## Network
+
+### With Gender 
+
+```{r gender-network}
+gender_network_plots
+```
+
+### With Race/Ethnicity
+
+```{r race-network}
+eth_network_plots
+```
+
+### With Offer 
+
+```{r offer-network}
+offer_network_plots
+```
+
+### Summary Table
+`r kable(network_summary)`
+
+## Application Outcomes
+
+### With Gender 
+
+```{r gender-outcome}
+gender_outcome_plots
+```
+
+### With Race/Ethnicity
+
+```{r race-outcome}
+eth_outcome_plots
+```
+
+### With Offer 
+
+```{r offer-outcome}
+offer_outcome_plots
+```
+
+### Summary Table
+
+`r kable(outcome_summary)`
+
+# Other plots
+
+### Faculty offer data versus institution data
+
+Institutions where respondents earned their PhD
+```{r phd-inst}
+phd_plots
+```
+
+Institutions where respondents held a postdoc position
+```{r postdoc-inst}
+postdoc_plots
+```
+
+Institutions where respondents had off-site interviews
+```{r off-inst}
+offsite_plots
+```
+
+Institutions where respondents had on-site interviews
+```{r on-inst}
+onsite_plots
+```
+
+###1st generation PhD versus IDP
+```{r phd-idp}
+phd_vs_idp_plot
+```
+
+###Teaching experience versus targeted institution
+```{r exp-inst}
+exp_vs_inst_plot
+```
+
+
+###Adjunct experience versus targeted institution -- The number of **respondents** with adjunct experience who submitted to and R1 or PUI institution NOT the number of apps.
+```{r adjunct-inst}
+adj_vs_inst_plot
+```
+
+
+###Faculty offer rejection according to respondent income: 
+
+The number of respondents that rejected at least one offer according to their income, how frequently they receive financial support (financial_support), and whether they have extra income (e.g., rentals, dividends)
+```{r offer-income}
+income_plot
+```
