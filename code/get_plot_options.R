@@ -5,59 +5,38 @@ library(grid)
 #library(patchwork)
 
 #preferred themes----
-my_theme <- theme_classic() + 
-  theme(legend.position = "none", axis.text=element_text(size=12), 
-        axis.title=element_text(size=14,face="bold"), 
-        plot.title = element_text(size=16,face="bold"), 
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        #plot.caption=element_text(size=12, hjust=.5),
-        plot.subtitle = element_text(size = 12, hjust = .5))
+base_theme <- theme_classic() + #basic plot settings for horizontal x-axis labels w/ legend
+  theme(axis.text=element_text(size=16), #font size
+        axis.title=element_text(size=18,face="bold"), 
+        plot.title = element_text(size=20,face="bold"), 
+        plot.caption=element_text(size=16, hjust=.5),
+        plot.subtitle = element_text(size = 16, hjust = .5))
 
-my_theme_horiz <- theme_classic()+ 
-  theme(legend.position = "none", axis.text=element_text(size=12), 
-        axis.title=element_text(size=14,face="bold"), 
-        plot.title = element_text(size=16,face="bold"),
-        #plot.caption = element_text(size=12, hjust=.5),
-        plot.subtitle = element_text(size = 12, hjust = .5),
-        #panel.border = element_blank()
-        )
+my_theme <- base_theme + #no legend, angled x-axis labels
+  theme(legend.position = "none",  
+        axis.text.x = element_text(angle = 45, hjust = 1))
 
-my_theme_leg <- theme_classic() + 
-  theme(axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"), 
-        plot.title = element_text(size=16,face="bold"), 
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        #plot.caption=element_text(size=12, hjust=.5),
-        plot.subtitle = element_text(size = 12, hjust = .5))
+my_theme_horiz <- base_theme+ #no legend, horizontal x-axis labels
+  theme(legend.position = "none")
 
-my_theme_leg_left <- theme_classic() + 
-  theme(axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"), 
-        plot.title = element_text(size=16,face="bold"), 
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "left", plot.caption=element_text(size=12, hjust=.5),
-        plot.subtitle = element_text(size = 12, hjust = .5))
+my_theme_leg <- base_theme + #angled x-axis labels w/ legend
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-my_theme_leg_bottom <- theme_classic() + 
-  theme(axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"), 
-        plot.title = element_text(size=16,face="bold"), 
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "bottom", plot.caption=element_text(size=12, hjust=.5),
-        plot.subtitle = element_text(size = 12, hjust = .5))
+my_theme_leg_left <- base_theme + #horizontal x-axis labels w/ legend on left
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "left")
 
-my_theme_leg_bottom_horiz <- theme_classic() + 
-  theme(axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"), 
-        plot.title = element_text(size=16,face="bold"),
-        legend.position = "bottom", plot.caption=element_text(size=12, hjust=.5),
-        plot.subtitle = element_text(size = 12, hjust = .5))
+my_theme_leg_bottom <- base_theme + #angled x-axis labels w/ legend below plot
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "bottom")
 
-my_theme_leg_horiz <- theme_classic() + 
-  theme(axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"), 
-        plot.title = element_text(size=16,face="bold"),
-        plot.subtitle = element_text(size = 12, hjust = .5))
+my_theme_leg_bottom_horiz <- base_theme + #horizontal x-axis labels w/ legend below plot
+  theme(legend.position = "bottom")
 
-right_margin <- theme(plot.margin = margin(t = 5.5, r = 15, b = 5.5, l = 5.5, unit = "pt"))
+right_margin <- theme(plot.margin = margin(t = 5.5, r = 15, b = 5.5, l = 5.5, 
+                                           unit = "pt")) #add padding
 
-#removing padding between axis and data
-#scale_x/y_discrete/continuous(expand = c(0,0))+
+#to remove padding between axis and data: scale_x/y_discrete/continuous(expand = c(0,0))+
 
 #adding proportion/count labels to barchart
 prop_lab_low <- geom_text(aes(label = scales::percent((..count..)/sum(..count..)), y= ((..count..)/sum(..count..))), stat = "count", vjust = 1)

@@ -1,30 +1,44 @@
 
 
-#calculate two decimal percentage given num & denom
+#calculate a two decimal percentage given num & denom
 get_percent <- function(x, y){
-  z <- (as.numeric(x)/as.numeric(y))*100
-  percent <- round(z, digits = 1)
+  z <- (as.numeric(x)/as.numeric(y))*100 #ensure values are coerced to numeric
+  percent <- round(z, digits = 2) #ensure no more than 2 decimal places
   return(percent)
 }
 
+#correllary to %in% function
 `%not_in%` <- Negate(`%in%`)
 
+#identify outlier values, returns binary response
 is_outlier <- function(x) {
   return(x < quantile(x, 0.25) - 1.5 * IQR(x) | x > quantile(x, 0.75) + 1.5 * IQR(x))
 }
 
 #plotting functions----
+#calculate percent respondents and generate basic bar plot given standard tidy dataset
+plot_perc_resp <- function(data, total){ #total is not in quotations
+  data %>% 
+    count(response) %>% 
+    mutate(percent = get_percent(n, total)) %>% 
+    ggplot(aes(x=response, y=percent))+
+    geom_col(position = "dodge")+
+    scale_y_continuous(expand = c(0,0))+ #ensure bars directly abut axis, no padding
+    labs(y="Respondents (%)")
+}
+
+#generate data set calculating the group-based percent of values
 get_plot_summary <- function(data, x, y){ #x and y must be provided in quotations
   
   df <- data %>% 
     select(!!sym(x), !!sym(y), id) %>% #!!sym() allows tidyverse functions to evaluate x and y as column names
-    group_by(!!sym(x), !!sym(y)) %>% 
-    summarise(n=n()) %>% 
+    count(!!sym(x), !!sym(y)) %>% 
     spread(key = !!sym(y), value = n) %>% 
     mutate_all(~replace(., is.na(.), 0)) %>% #replace na values w/ 0 to allow percent calculations
     mutate(percent_res = get_percent(true, false),
-           n = true+false,
-           r = paste0("r=", true)) %>% 
+           n = true+false#, #row-based total
+           #r = paste0("r=", true) #added during covid analysis of rescinded offers
+           ) %>% 
     mutate('{x}' := paste0(!!sym(x), " (n=", n, ")"))#add n of each group to the group name; '{}' := allows mutate to evaluate the variable x as a column
   
   return(df)
@@ -32,7 +46,8 @@ get_plot_summary <- function(data, x, y){ #x and y must be provided in quotation
 
 
 #for data dump---
-plot_raw_data <- function(df, s, p, f){
+#calculate grouped percent and generate minimal bar plot
+plot_raw_data <- function(df, s, p, f){ 
   
   df <- df %>% 
     select(id, section, question, response, !!sym(f)) %>% 
@@ -65,7 +80,6 @@ plot_raw_data <- function(df, s, p, f){
 }
 
 #for social science 
-
 get_wilcox_tbl <- function(x, y){ 
   x <- get(x)
   
@@ -86,79 +100,83 @@ get_pair_wilcox_tbl <- function(x, y){
   pval <- dimnames(x$p.value)
 }
 
+#convert wilcox test output to tbl and save as csv
 save_wilcox <- function(wilcox, file){
   
-  mw_p <- wilcox
+  mw_p <- wilcox #pull p-values from wilcox test
   
-  mw_val <- unlist(mw_p) %>% as_tibble_col()
+  mw_val <- unlist(mw_p) %>% 
+    as_tibble_col() #convert test output to tibble
   
-  mw_key <- names(mw_p) %>% as_tibble_col(column_name = "key")
+  mw_key <- names(mw_p) %>% 
+    as_tibble_col(column_name = "key") #ensure values are named
   
-  mw_tbl <- cbind(mw_key, mw_val)
+  mw_tbl <- cbind(mw_key, mw_val) #generate final table
   
   write_csv(mw_tbl, file)
   
   print("save csv")
 }
 
+#filter dataset, calculate wilcox, and return barplot
 plot_mwu_bar_data <- function(df, q, f, f_text, mwu, l, bin){
   
-  df_test <- df %>% 
-    filter(question == q) %>% distinct()
+  df_test <- df %>% filter(question == q) %>% distinct()
   
-  print(head(df))
+  print(head(df)) #verify dataset
   
-  q_bin <- if(bin == "yes"){
+  q_bin <- if(bin == "yes"){#identify name of binned column
     print("bin")
-    paste0(q, "_binned")
+    paste0(q, "_binned") 
   }else{NULL}
   
-  print(q_bin)
+  print(q_bin) #verify col name
   
-  df_bin <- if(bin == "yes"){
-    df %>% filter(question == q_bin) %>% distinct()
+  df_bin <- if(bin == "yes"){#filter dataset for binned col
+    df %>% 
+      filter(question == q_bin) %>% 
+      distinct() 
   }else{NULL}
   
-  print(head(df_bin))
+  print(head(df_bin)) #verify binned dataset or none
   
-  q_x <- str_replace_all(q, "_", " ")
+  q_x <- str_replace_all(q, "_", " ") #generate value for x-axis title
   
-  print(q_x)
+  print(q_x) #verify x-axis
   
-  l_long <- case_when(
+  l_long <- case_when( #identify which bin was used
     l == "small" ~ "bin_levels_small",
     l == "big" ~ "bin_levels_big")
   
-  l_long <- if(!is.na(l_long)){
+  l_long <- if(!is.na(l_long)){ #pull in bin levels
     get(l_long)
   }else{NULL}
   
-  mwu_tbl <- if(mwu == "yes"){
+  mwu_tbl <- if(mwu == "yes"){ #conduct/return wilcox test
     print(f)
     
-    resp <- df_test[["response"]]
+    resp <- df_test[["response"]] #get column with data values
     
-    f_col <- df_test[[f]]
+    f_col <- df_test[[f]] #get column with comparison variables
     
-    if(f == "simple_gender"){
+    if(f == "simple_gender"){ 
       
-      f_col <- f_col %not_in% "No Response"
+      f_col <- f_col %not_in% "No Response" #filter out "no resp" values for simple_gender
     }
     
-    wilcox.test(as.numeric(resp) ~ f_col,
+    wilcox.test(as.numeric(resp) ~ f_col,#run wilcox test
                         na.rm=TRUE, paired=FALSE, 
                         exact=FALSE, conf.int=TRUE)
   }else{NULL}
   
-  plot <- if(nrow(df) == 0){NULL}else{
-    if(l == "none"){
+  plot <- if(nrow(df) == 0){NULL}else{ #check against empty datasets & generate plot
+    if(l == "none"){ #get plot without bin levels
       
       base <- ggplot(data = df_test, 
                      aes_string(x="response", fill=f))+
         geom_bar(position = "dodge")
       
-      if(mwu == "yes"){
-        print("1")
+      if(mwu == "yes"){ #add wilcox test results
         
         base +
         coord_flip() +
@@ -167,15 +185,14 @@ plot_mwu_bar_data <- function(df, q, f, f_text, mwu, l, bin){
              subtitle = paste0("Mann Whitney U p-value = ", 
                               round(mwu_tbl[[3]], digits = 3)))
       
-        }else{
-          print("2")
+        }else{ #complete plot w/o wilcox
           
           base + 
             coord_flip()+
             labs(y="Number of responses", x=paste0("Number of ", q_x),
             fill = f_text)
              }
-    }else{
+    }else{ #pull bin levels and use to generate bar plot
       
       base <- ggplot(data = df_bin, aes_string(x="factor(
           response, levels = l_long, labels = l_long)", fill=f))+
@@ -184,16 +201,14 @@ plot_mwu_bar_data <- function(df, q, f, f_text, mwu, l, bin){
         scale_x_discrete(drop=FALSE)+
         coord_flip()
       
-      if(mwu == "yes"){
-        print("3")
+      if(mwu == "yes"){ #add wilcox test results
         
         base + 
           labs(y="Number of responses", #x=paste0("Number of ", q_x),
                fill = f_text, 
                subtitle = paste0("Mann Whitney U p-value = ",
                                 round(mwu_tbl[[3]], digits = 3)))
-      }else{
-        print("4")
+      }else{ #complete plot w/o wilcox results
         
         base + 
           labs(y="Number of responses", x=paste0("Number of ", q_x),
@@ -204,25 +219,26 @@ plot_mwu_bar_data <- function(df, q, f, f_text, mwu, l, bin){
   return(plot)
 }
 
+#filter dataset, calculate wilcox, and return boxplot
 plot_mwu_box_data <- function(df, q, f, f_text, mwu){
   
-  df_test <- df %>% 
+  df_test <- df %>% #filter dataset
     filter(question == q) %>% distinct()
   
-  print(head(df))
+  print(head(df)) #verify dataset
   
-  q_x <- str_replace_all(q, "_", " ")
+  q_x <- str_replace_all(q, "_", " ") #generate x-axis title
   
-  print(q_x)
+  print(q_x) #verify x-axis title
 
-  mwu_tbl <- if(mwu == "yes"){
+  mwu_tbl <- if(mwu == "yes"){ #conduct wilcox test
     print(f)
     
-    resp <- df_test[["response"]]
+    resp <- df_test[["response"]] #get numerical values
     
-    f_col <- df_test[[f]]
+    f_col <- df_test[[f]] #get factored variable
     
-    if(f == "simple_gender"){
+    if(f == "simple_gender"){ #drop "No resp" values
       
       f_col <- f_col %not_in% "No Response"
     }
@@ -232,19 +248,19 @@ plot_mwu_box_data <- function(df, q, f, f_text, mwu){
                 exact=FALSE, conf.int=TRUE)
   }else{NULL}
   
-  plot <- if(nrow(df) == 0){NULL}else{
+  plot <- if(nrow(df) == 0){NULL}else{ #check against empty df and generate plot
     base <- ggplot(data = df_test, 
                    aes_string(x="as.numeric(response)", y = f, fill=f))+
       geom_boxplot()+
       coord_flip()
       
-      if(mwu == "yes"){
+      if(mwu == "yes"){ #add wilcox test restults
         base +
           labs(y=f_text, x=paste0("Number of ", q_x),
                subtitle = paste0("Mann Whitney U p-value = ", 
                                 round(mwu_tbl[[3]], digits = 3)))
         
-      }else{
+      }else{ #complete plots w/o wilcox
         base + 
           labs(y=f_text, x=paste0("Number of ", q_x))
       }
