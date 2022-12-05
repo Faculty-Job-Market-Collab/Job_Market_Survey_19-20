@@ -1,0 +1,12 @@
+[submodule "smith_prestige"]
+	path = smith_prestige
+	url = git@github.com:Faculty-Job-Market-Collab/Smith_Prestige_2022.git
+[submodule "kozik_caregivers"]
+	path = kozik_caregivers
+	url = git@github.com:Faculty-Job-Market-Collab/Kozik_Caregivers_2022.git
+[submodule "jadavji_biology"]
+	path = jadavji_biology
+	url = git@github.com:Faculty-Job-Market-Collab/Jadavji_Biology_2022.git
+[submodule "mollet_socialsci"]
+	path = mollet_socialsci
+	url = git@github.com:Faculty-Job-Market-Collab/Mollet_SocialSci_2022.git
