@@ -10,7 +10,10 @@ base_theme <- theme_classic() + #basic plot settings for horizontal x-axis label
         axis.title=element_text(size=18,face="bold"), 
         plot.title = element_text(size=20,face="bold"), 
         plot.caption=element_text(size=16, hjust=.5),
-        plot.subtitle = element_text(size = 16, hjust = .5))
+        plot.subtitle = element_text(size = 16, hjust = .5),
+        strip.text = element_text(size = 16),
+        legend.text = element_text(size = 16), 
+        legend.title = element_text(size = 18))
 
 my_theme <- base_theme + #no legend, angled x-axis labels
   theme(legend.position = "none",  
@@ -47,17 +50,35 @@ prop_lab_high <- geom_text(aes(label = scales::percent((..count..)/sum(..count..
 
 count_lab_high <- geom_text(stat = "count", aes(label=..count..), vjust = -1)
 
-#colorblind palettes
-#The palette with grey:
-cbPalette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999") #grey, goldenrod, light blue, dark green, gold, navy blue, orange rust, pink
+#colorblind palettes----
+cbPalette <- c("#000000", #black
+               "#E69F00", #goldenrod
+               "#56B4E9", #light blue
+               "#009E73", #dark green
+               "#F0E442", #gold
+               "#0072B2", #blue
+               "#D55E00", #orange rust
+               "#CC79A7", #dusty pink
+               "#999999") #grey
 
-# The palette with black:
-cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7") #black
+#adjusted_gender palette
+gender_breaks <- c("Man", "Woman", "Trans/GNC")
 
-#simple_gender palette
-gender_color <- c("#E69F00", "#009E73", "#F0E442")
+gender_color <- c("#009E73", "#D55E00", "#E69F00")
 
-peer_color <- c("#56B4E9", "#CC79A7")
+#simple_gender
+gender_simple_breaks <- c("Man", "Woman/Trans/GNC", "No Response")
+
+#peer palette
+peer_breaks <- c("Yes", "No")
+
+#research palette
+research_breaks <- c("Biological Sciences", "Chemistry",
+                     "Computer & Information Sciences",    
+                     "Engineering", "Geosciences", "Humanities",
+                     "Integrated Sciences", 
+                     "Mathematical & Physical Sciences", 
+                     "Social, Behavior, & Economic Sciences")
 
 #plotting placeholder----
 blank_plot <- ggplot()+
@@ -84,5 +105,5 @@ get_legend_plot <- function(p){
   
   leg <- get_legend(p)
   
-  plot_grid(leg) 
+  plot_grid(leg, greedy = FALSE) 
 }

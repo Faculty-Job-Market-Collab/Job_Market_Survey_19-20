@@ -27,21 +27,35 @@ plot_perc_resp <- function(data, total){ #total is not in quotations
     labs(y="Respondents (%)")
 }
 
-#generate data set calculating the group-based percent of values
-get_plot_summary <- function(data, x, y){ #x and y must be provided in quotations
+#generate data set calculating the group-based percent of variables with binary values
+get_plot_summary <- function(data, x, y, binary){ #x and y must be provided in quotations
   
   df <- data %>% 
     select(!!sym(x), !!sym(y), id) %>% #!!sym() allows tidyverse functions to evaluate x and y as column names
-    count(!!sym(x), !!sym(y)) %>% 
-    spread(key = !!sym(y), value = n) %>% 
-    mutate_all(~replace(., is.na(.), 0)) %>% #replace na values w/ 0 to allow percent calculations
-    mutate(percent_res = get_percent(true, false),
+    distinct() 
+  
+  calc_perc <- if(binary==TRUE){
+    df %>% 
+      count(!!sym(x), !!sym(y)) %>% 
+      spread(key = !!sym(y), value = n) %>% 
+      mutate_all(~replace(., is.na(.), 0)) %>%  #replace na values w/ 0 to allow percent calculations
+      mutate(percent_res = get_percent(true, false),
            n = true+false#, #row-based total
            #r = paste0("r=", true) #added during covid analysis of rescinded offers
-           ) %>% 
-    mutate('{x}' := paste0(!!sym(x), " (n=", n, ")"))#add n of each group to the group name; '{}' := allows mutate to evaluate the variable x as a column
+    ) %>% 
+      mutate('{x}' := paste0(!!sym(x), " (n=", n, ")"))#add n of each group to the group name; '{}' := allows mutate to evaluate the variable x as a column
+    
+    }else{
+      group_count <- df %>% count(!!sym(x)) %>% 
+        rename("total" = n)
+      
+     df %>% 
+       count(!!sym(x), !!sym(y)) %>% 
+       left_join(., group_count, by = x) %>% 
+       mutate(percent = get_percent(n, total))
+    }
   
-  return(df)
+  return(calc_perc)
 }
 
 
