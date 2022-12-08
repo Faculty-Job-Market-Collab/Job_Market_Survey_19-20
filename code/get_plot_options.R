@@ -80,7 +80,7 @@ research_breaks <- c("Biological Sciences", "Chemistry",
                      "Engineering", "Geosciences", "Humanities",
                      "Integrated Sciences", 
                      "Mathematical & Physical Sciences", 
-                     "Social, Behavior, & Economic Sciences")
+                     "Social, Behavior, &\nEconomic Sciences")
 
 #plotting placeholder----
 blank_plot <- ggplot()+
