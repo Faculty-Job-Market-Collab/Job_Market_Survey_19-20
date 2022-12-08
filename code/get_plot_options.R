@@ -72,6 +72,8 @@ gender_simple_breaks <- c("Man", "Woman/Trans/GNC", "No Response")
 #peer palette
 peer_breaks <- c("Yes", "No")
 
+peer_color <- c("#56B4E9", "#F0E442")
+
 #research palette
 research_breaks <- c("Biological Sciences", "Chemistry",
                      "Computer & Information Sciences",    
