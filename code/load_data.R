@@ -22,7 +22,16 @@ setnames(data, old = q_num, new = q_data) #rename columns
 #arrange data and split into data sets
 clean_data <- mutate(data, id = rownames(data)) %>% #generate unique ids
   filter(previous_tenure_track == "No" | is.na(previous_tenure_track)) %>%  #drop responders reporting a previous tenure track postion
-  select(-previous_tenure_track)
+  select(-previous_tenure_track) %>% 
+  mutate(apps_submitted_correct = as.numeric(R1_apps_submitted) + as.numeric(PUI_apps_submitted),
+         apps_submitted = if (any(as.numeric(apps_submitted) < as.numeric(apps_submitted_correct))){ 
+           apps_submitted_correct
+           }else{
+             apps_submitted
+             }) %>% 
+  filter(as.numeric(apps_submitted) >= 1) %>% 
+  filter(!is.na(apps_submitted)) %>% 
+  select(-apps_submitted_correct)
 
 #dataset for each institution listed w/ pui, ri status, region, etc
 carn_data <- read_csv("data/full_survey_inst_data.csv") %>% 

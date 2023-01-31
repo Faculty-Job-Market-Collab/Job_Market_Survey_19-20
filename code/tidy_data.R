@@ -111,7 +111,6 @@ source("code/sort_identity_data.R") #code to identify yes/no PEER status
 demo_data <- rbind(eth_data_merge, demo_data) #merge PEER status w/ demo
 
 # qualifications data ----
-
 qualif_data <- qualifications %>% 
   mutate(across(c(1:4, 7, 11:14), as.numeric)) %>% #prep columns for bins
   mutate(across(c(1:4, 7, 13, 14), get_small_bins, .names = "{.col}_binned"), #bin using bin_levels_small
@@ -243,7 +242,7 @@ network_data <- network %>%
            response == "From an internal referral (the position was not advertised when I first learned about it)" ~ "Internal referral, unadvertised",
            response == "A contact at the hiring institution" ~ "Hiring inst contact",
            TRUE ~ response
-         )) 
+         ))
 
 #join tidy_data----
 tidy_data <- rbind(demo_data, qualif_data, percept_data, 

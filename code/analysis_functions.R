@@ -10,6 +10,35 @@ get_percent <- function(x, y){
 #correllary to %in% function
 `%not_in%` <- Negate(`%in%`)
 
+#calculate outliers using mad
+get_mad_outliers <- function(data, col_name){ #place dataset and column name in quotes
+  
+  df <- get(data) %>% 
+    select(!!sym(col_name)) %>% 
+    mutate('{col_name}' := as.numeric(!!sym(col_name)))
+  
+  calc_sd <- sd(df[[deparse(ensym(col_name))]], na.rm = TRUE)
+  
+  calc_med <- median(df[[deparse(ensym(col_name))]], na.rm = TRUE) #calculate column median
+  
+  abs_dev_df <- df %>% 
+    mutate(abs_dev = abs(!!sym(col_name) - as.numeric(calc_med)))
+  
+  est_c <- calc_sd/(median(abs_dev_df$abs_dev, na.rm = TRUE)) #estimate mad constant
+  
+  calc_mad <- est_c * median(abs_dev_df$abs_dev, na.rm = TRUE)
+  
+  calc_max <- as.numeric(calc_med)+(3*as.numeric(calc_mad)) 
+  
+  mad_df <- tibble(
+    data = col_name,
+    mad = calc_mad,
+    max = calc_max
+  )
+  
+  return(mad_df)
+}
+
 #identify outlier values, returns binary response
 is_outlier <- function(x) {
   return(x < quantile(x, 0.25) - 1.5 * IQR(x) | x > quantile(x, 0.75) + 1.5 * IQR(x))
