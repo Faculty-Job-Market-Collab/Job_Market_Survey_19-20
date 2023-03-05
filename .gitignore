@@ -7,4 +7,6 @@
 *.xlsx
 *.docx
 /BWF_grant
+/financial-vulnerability-index
+/ASCC_admin
 *.RData
