@@ -10,3 +10,4 @@
 /financial-vulnerability-index
 /ASCC_admin
 *.RData
+*.Rhistory
