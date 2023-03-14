@@ -94,20 +94,28 @@ clean_data_repaired <- clean_data %>% #shorten and condense response values
 # collapse gender data categories----
 set_lgbt_data <- clean_data %>% 
   select(id, gender, cis_trans_status, sexual_orientation) %>% 
-  mutate(gender = if_else(gender=="Non-binary"|gender=="Unlisted gender"|is.na(gender), 
+  mutate(gender = if_else(is.na(gender), "NR", gender),
+         cis_trans_status = if_else(is.na(cis_trans_status), "NR", cis_trans_status),
+         sexual_orientation = if_else(is.na(sexual_orientation), "NR", sexual_orientation),
+         gender = if_else(gender=="Non-binary"|gender=="Unlisted gender", 
                           "Gender minority", gender),
-         cis_trans_status = if_else(cis_trans_status != "Cis", "gnc", cis_trans_status),
-         cis_trans_status = if_else(is.na(cis_trans_status), "nr", cis_trans_status),
-         tgnc = if_else(gender == "Gender minority" | cis_trans_status == "gnc", "yes", "no"),
+         cis_trans_status = case_when(
+           cis_trans_status == "Cis" ~ "Cis",
+           cis_trans_status == "NR" ~ "NR", 
+           TRUE ~ "GNC"),
+         tgnc = if_else(gender == "Gender minority" | cis_trans_status == "GNC", "Yes", "No"),
          lgb = case_when( #collapse sexual orientation options into y/n
-           sexual_orientation == "NA"|is.na(sexual_orientation) ~ "NA",
-           str_detect(sexual_orientation, "heterosexual") ~ "no",
-           TRUE ~ "yes"),
-         #simple_gender = if_else(adjusted_gender == "Man", "Man", "Woman/Trans/GNC"),
-         #simple_gender = if_else(is.na(simple_gender), "No Response", simple_gender),
-         lgbtqia = if_else(lgb == "yes" | tgnc == "yes", "yes", "no"),
-         adjusted_gender = if_else(lgbtqia == "yes", "LGB+/GNC", gender)) %>% #collapse lgbt+ respondents across cols) #collapse lgbt+ group across cols
-  select(id, gender, lgbtqia, adjusted_gender)
+           sexual_orientation == "NA"|is.na(sexual_orientation) ~ "NR",
+           sexual_orientation == "NR" ~ "NR",
+           str_detect(sexual_orientation, "heterosexual") ~ "No",
+           TRUE ~ "Yes"),
+         lgbtqia = if_else(lgb == "Yes" | tgnc == "Yes", "Yes", "No"),
+         adjusted_gender = if_else(lgbtqia == "Yes", "LGB+/GNC", gender),
+         simple_gender = case_when(
+           adjusted_gender == "Man" ~ "Man",
+           is.na(adjusted_gender) ~ "No Response",
+           TRUE ~ "Woman/Trans/GNC")) %>% #collapse lgbt+ respondents across cols) #collapse lgbt+ group across cols
+  select(id, gender, lgbtqia, adjusted_gender, simple_gender)
 
 # collapse ethnicity data categories----
 set_ethnicity_data <- clean_data %>% 
@@ -181,7 +189,26 @@ separated_qual_data <- clean_data %>%
          grants_awarded = str_remove_all(grants_awarded, 
                                          "\\(e\\.g\\., NIH R01\\),?|\\(e\\.g\\., R01\\),?|\\(e\\.g\\., K99\\)|\\(e\\.g\\., NIH K99\\)"),
          fellowship = if_else(str_detect(grants_awarded, "Fellow"), "Yes", "No"),
-         transition_award = if_else(str_detect(grants_awarded, "Transition"), "Yes", "No")) %>% 
+         transition_award = case_when(
+           str_detect(grants_awarded, "Transition") ~ "Yes", 
+           grants_awarded == "NR" ~ "NR",
+           TRUE ~ "No"),
+         postdoctoral_fellow = case_when(
+           str_detect(grants_awarded, "Postdoctoral") ~ "Yes",
+           grants_awarded == "NR" ~ "NR",
+           TRUE ~ "No"),
+         predoctoral_fellow = case_when(
+           str_detect(grants_awarded, "Predoctoral") ~ "Yes",
+           grants_awarded == "NR" ~ "NR",
+           TRUE ~ "No"),
+         grant_pi = case_when(
+           str_detect(grants_awarded, "Grant as co-PI") ~ "Yes",
+           grants_awarded == "NR" ~ "NR",
+           TRUE ~ "No"),
+         grant_copi = case_when(
+           str_detect(grants_awarded, "Grant as PI") ~ "Yes",
+           grants_awarded == "NR" ~ "NR",
+           TRUE ~ "No")) %>% 
   separate(grants_awarded, sep = ",", #respondents allowed to select all that apply, split responses into multiple values
            into = c("resp1", "resp2", "resp3", "resp4", "resp5")) %>% 
   gather(resp1:resp5, key = "dummy2", value = "grants_awarded", na.rm = TRUE) %>% 
@@ -282,11 +309,17 @@ collapse_perception_data <- clean_data %>%
 separated_outcome_data <- clean_data %>% 
   select(id, faculty_offers, offer_responses) %>% 
   mutate(faculty_offers = str_remove_all(faculty_offers, "\\(.*\\)"),
+         faculty_offers = str_remove(faculty_offers, ",.*"),
+         faculty_offers = str_remove(faculty_offers, "(?<=\\d).*"),
+         faculty_offers = if_else(is.na(faculty_offers)|str_detect(faculty_offers, "N/A"), 
+                                  "NR", faculty_offers),
+         faculty_offers = if_else(str_detect(faculty_offers, "[^NR][[:alpha:]]+"), "0", faculty_offers),
          offer_responses = if_else(is.na(offer_responses), "NR", offer_responses)) %>% #replace NA values with "NR" to prevent respondents being dropped during the gather
   separate(., offer_responses, sep = ",", #respondents allowed to select all that apply, split responses into multiple values
            into = c("resp1", "resp2", "resp3", "resp4", "resp5", "resp6",
                     "resp7", "resp8", "resp9")) %>% 
-  gather(resp1:resp9, key = "dummy", value = "offer_responses", na.rm = TRUE)
+  gather(resp1:resp9, key = "dummy", value = "offer_responses", na.rm = TRUE) %>% 
+  select(-dummy)
 
 #calculate number of reasons reported for rejecting offers
 calc_num_reject <- separated_outcome_data %>% 
@@ -364,9 +397,7 @@ merged_cleaned_data <- clean_data_repaired %>%
          -research_product_satisfaction, -transparent_process, -outcome_satisfaction,
          -family_impeded_search, -citizenship_impeded_search, -mental_health_impact,
          -search_affected_other_goals, -commitment_impact, -offer_responses,
-         -apps_submitted, -RI_apps_submitted, -PUI_apps_submitted,
-         -off_site_interviews, -rejections_received, -faculty_offers,
-         -onsite_interview_ad_1, -onsite_interview_ad_2) %>% 
+         -faculty_offers, -onsite_interview_ad_1, -onsite_interview_ad_2) %>% 
   left_join(., identity_data, by = "id") %>% 
   left_join(., repaired_qual_data, by = "id") %>% 
   left_join(., repaired_prep_data, by = "id") %>% 
