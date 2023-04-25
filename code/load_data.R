@@ -13,17 +13,12 @@ source("code/get_ffi_data.R")
 survey_data <- left_join(clean_data, ffi_data, by = "id")
 
 #dataset for each institution listed w/ pui, ri status, region, etc
-carn_data <- read_csv("data/full_survey_inst_data_19-20_only.csv") %>% 
-  mutate(id = paste0(id, "_2019-2020"),
-         State_Providence = fct_collapse(State_Providence,
-                                         California = c("California", "CA"),
-                                         Connecticut = c("Connecticut", "CT"),
-                                         Alabama = c("Alabama", "AL")))
+inst_data <- read_csv("data/final_survey_inst_data_2019-2022_2023-04-11.csv") 
 
-inst_data <- carn_data %>% 
-  select(id, inst_type, NAME, State_Providence, US_region, PUI_RI, 
-         Country, world_region, Other_inst_type) %>% 
-  gather(-id, -inst_type, -NAME, key = "inst_key", value = "inst_value")
+inst_data <- inst_data %>% 
+  select(id, inst_type, inst_id, US_region, PUI_RI, 
+         world_region, Other_inst_type) %>% 
+  gather(-id, -inst_type, -inst_id, key = "inst_key", value = "inst_value")
 
 ## question-based datasets----
 #demographics <- select(clean_data, position:biomedical, id) #individual descriptives
@@ -47,9 +42,12 @@ inst_data <- carn_data %>%
 
 
 #convert to tidied dataset
-tidy_data <- clean_data %>% 
-  gather(-id, key = "question", value = "response") %>% 
-  left_join(., inst_data, by = "id") %>% #add Carnegie data for provided institution values
-  distinct()
+#tidy_data <- clean_data 
+#
+#tidy_data <- clean_data %>% 
+#  left_join(., inst_data, by = "id") %>% #add Carnegie data for provided institution values
+#  distinct() %>% 
+#  gather(-id, -inst_type, -inst_id, -inst_key, -inst_value, 
+#         key = "question", value = "response")
 
 #write_csv(tidy_data, "data/tidy_data") #optional local save of fully cleaned data set

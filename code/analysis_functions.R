@@ -26,9 +26,9 @@ get_mad_outliers <- function(data, col_name){ #place dataset and column name in 
   
   est_c <- calc_sd/(median(abs_dev_df$abs_dev, na.rm = TRUE)) #estimate mad constant
   
-  calc_mad <- est_c * median(abs_dev_df$abs_dev, na.rm = TRUE)
+  calc_mad <- round(est_c * median(abs_dev_df$abs_dev, na.rm = TRUE))
   
-  calc_max <- as.numeric(calc_med)+(3*as.numeric(calc_mad)) 
+  calc_max <- round(as.numeric(calc_med)+(3*as.numeric(calc_mad)))
   
   mad_df <- tibble(
     data = col_name,
@@ -37,6 +37,32 @@ get_mad_outliers <- function(data, col_name){ #place dataset and column name in 
   )
   
   return(mad_df)
+}
+
+is_mad_outlier <- function(mad_data, x, y){
+  
+  data <- get(mad_data)
+  
+  paper_max <- data[[1,3]]
+  abstract_max <- data[[2,3]]
+  corres_max <- data[[3,3]]
+  first_max <- data[[4,3]]
+  citation_max <- data[[5,3]]
+  hindex_max <- data[[6,3]]
+  apps_max <- data[[7,3]]
+    
+  output <- case_when(
+    y == "peer-reviewed_papers" & as.numeric(x) > paper_max ~ "yes",
+    y == "conference_abstracts" & as.numeric(x) > abstract_max ~ "yes",
+    y == "corresponding_author" & as.numeric(x) > corres_max ~ "yes",
+    y == "first_author" & as.numeric(x) > first_max ~ "yes",
+    y == "scholar_citations_all" & as.numeric(x) > citation_max ~ "yes",
+    y == "scholar_hindex" & as.numeric(x) > hindex_max ~ "yes",
+    y == "apps_submitted" & as.numeric(x) > apps_max ~ "yes",
+    TRUE ~ "no"
+  )
+  
+  return(output)
 }
 
 #identify outlier values, returns binary response

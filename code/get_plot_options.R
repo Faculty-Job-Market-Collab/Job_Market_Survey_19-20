@@ -62,12 +62,12 @@ cbPalette <- c("#000000", #black
                "#999999") #grey
 
 #adjusted_gender palette
-gender_breaks <- c("Man", "Woman", "Trans/GNC")
+gender_breaks <- c("Man", "Woman", "LGB+/GNC")
 
 gender_color <- c("#009E73", "#D55E00", "#E69F00")
 
 #simple_gender
-gender_simple_breaks <- c("Man", "Woman/Trans/GNC", "No Response")
+gender_simple_breaks <- c("Man", "Woman/LGB+/GNC", "No Response")
 
 #peer palette
 peer_breaks <- c("Yes", "No")
