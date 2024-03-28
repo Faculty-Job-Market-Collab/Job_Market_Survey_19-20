@@ -10,6 +10,30 @@ get_percent <- function(x, y){
 #correllary to %in% function
 `%not_in%` <- Negate(`%in%`)
 
+#identify the mode for a single metric from a tidy dataset
+get_mode <- function(data, metric){
+  
+  print(metric)
+  
+  df <- get(data) %>% #pull in data and filter for desired metric
+    filter(question == metric) %>% 
+    distinct()
+  
+  calc_max <- df %>% count(question, response) %>% #count n of each response
+    pull(n) %>% unlist() %>% 
+    max()#find highest n value
+  
+  calc_mode <- df %>% count(question, response) %>% #retain question column & count n of each response
+    arrange(desc(n)) %>% filter(n == calc_max) #pull rows with ns that match the max
+  
+  mode_df <- calc_mode %>% 
+    rowid_to_column() %>% #create identifiers for multiple modes to allow spread()
+    rename(mode_value = response, mode_n = n)
+  
+  return(mode_df)
+}
+
+
 #calculate outliers using mad
 get_mad_outliers <- function(data, col_name){ #place dataset and column name in quotes
   
