@@ -11,3 +11,6 @@
 	path = mollet_socialsci
 	url = git@github.com:Faculty-Job-Market-Collab/Mollet_SocialSci_2022.git
 
+[submodule "Ogden_RIvPUI_2024"]
+	path = Ogden_RIvPUI_2024
+	url = git@github.com:Faculty-Job-Market-Collab/Ogden_RIvPUI_2024.git
