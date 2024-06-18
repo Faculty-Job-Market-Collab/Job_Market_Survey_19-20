@@ -8,6 +8,7 @@
 *.docx
 /BWF_grant
 /financial-vulnerability-index
+/shared_compiled_data
 /ASCC_admin
 *.RData
 *.Rhistory
